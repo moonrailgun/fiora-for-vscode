@@ -1,7 +1,29 @@
 import * as vscode from 'vscode';
+import { FioraChatDataProvider } from './provider/FioraChatDataProvider';
 import { getToken, saveToken } from './storage';
 
 export function register(context: vscode.ExtensionContext) {
+  const provider = new FioraChatDataProvider(context);
+  const fioraChatView = vscode.window.createTreeView('fiora-chat-view', {
+    treeDataProvider: provider,
+  });
+  context.subscriptions.push(fioraChatView);
+  const fioraChatExplorerView = vscode.window.createTreeView(
+    'fiora-chat-view-explorer',
+    { treeDataProvider: provider }
+  );
+  context.subscriptions.push(fioraChatExplorerView);
+
+  function refresh() {
+    // TODO
+  }
+
+  // Refresh
+  context.subscriptions.push(
+    vscode.commands.registerCommand('fiora-for-vscode.refresh', refresh)
+  );
+
+  // Login
   context.subscriptions.push(
     vscode.commands.registerCommand('fiora-for-vscode.login', async () => {
       const oldToken = getToken();
