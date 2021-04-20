@@ -6,6 +6,8 @@ import { output } from './logger';
 import { register } from './register';
 import { getToken } from './storage';
 
+let client: FioraClient;
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -15,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   register(context);
 
-  const client = new FioraClient();
+  client = new FioraClient();
   setTimeout(async () => {
     const token = getToken();
 
@@ -32,4 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  if (client !== null && client instanceof FioraClient) {
+    client.close();
+  }
+}

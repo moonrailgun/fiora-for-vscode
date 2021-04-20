@@ -5,7 +5,7 @@ import { platform } from 'os';
 
 export class FioraClient {
   private _socket = IO('https://fiora.suisuijiang.com', {
-    // autoConnect: false,
+    autoConnect: false,
     transports: ['websocket'],
     extraHeaders: {
       Origin: 'https://fiora.suisuijiang.com',
@@ -90,5 +90,9 @@ export class FioraClient {
     }
 
     return user;
+  }
+
+  close() {
+    this._socket.close();
   }
 }
