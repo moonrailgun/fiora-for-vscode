@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
+import { FioraGroupItem } from '../client';
 
 interface FioraChatDataItem {
   parent?: FioraChatDataItem;
   name: string;
   unreadCount?: number;
   type: 'Container' | 'Item';
+  icon?: string;
 }
 
 export class FioraChatDataProvider
@@ -12,21 +14,14 @@ export class FioraChatDataProvider
   /**
    * Fiora 列表数据提供器
    */
-  _context: vscode.ExtensionContext;
-  _onDidChangeTreeData: vscode.EventEmitter<FioraChatDataItem>;
+  private _onDidChangeTreeData = new vscode.EventEmitter<FioraChatDataItem | void>();
   onDidChangeTreeData: vscode.Event<
     FioraChatDataItem | undefined | null | void
-  >;
-  _icons: Record<string, string>;
+  > = this._onDidChangeTreeData.event;
+  private groups: FioraGroupItem[] = [];
+  private icons: Record<string, string> = {};
 
-  constructor(_context: vscode.ExtensionContext) {
-    this._context = _context;
-
-    this._onDidChangeTreeData = new vscode.EventEmitter<FioraChatDataItem>();
-    this.onDidChangeTreeData = this._onDidChangeTreeData.event;
-
-    this._icons = {};
-  }
+  constructor(private _context: vscode.ExtensionContext) {}
 
   getChildren(
     element?: FioraChatDataItem
@@ -40,7 +35,12 @@ export class FioraChatDataProvider
     } else {
       if (element.name === 'Group') {
         // 列出群组
-        return [];
+        return this.groups.map((group) => ({
+          name: group.name,
+          unreadCount: 0,
+          type: 'Item',
+          icon: this.icons[group._id],
+        }));
       } else if (element.name === 'DM') {
         // 列出私信
         return [
@@ -70,6 +70,10 @@ export class FioraChatDataProvider
       treeItem.label += ' (' + element.unreadCount + ')';
     }
 
+    if (typeof element.icon === 'string') {
+      treeItem.iconPath = element.icon;
+    }
+
     return treeItem;
   }
 
@@ -77,5 +81,18 @@ export class FioraChatDataProvider
     element: FioraChatDataItem
   ): vscode.ProviderResult<FioraChatDataItem> {
     return element ? element.parent : undefined;
+  }
+
+  setListData(groups: FioraGroupItem[]) {
+    this.groups = groups;
+    this.refresh();
+  }
+
+  setIcons(icons: Record<string, string>) {
+    this.icons = icons;
+  }
+
+  refresh() {
+    this._onDidChangeTreeData.fire();
   }
 }

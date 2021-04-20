@@ -3,17 +3,39 @@ import * as vscode from 'vscode';
 import { SealText, SealUserTimeout } from './const';
 import { platform } from 'os';
 
+export interface FioraGroupItem {
+  _id: string;
+  name: string;
+  avatar: string;
+  createTime: string;
+  creator: string;
+}
+
+export interface FioraUserInfo {
+  _id: string;
+  avatar: string;
+  username: string;
+  tag: string;
+  groups: FioraGroupItem[];
+  friends: unknown[];
+  token: string;
+  isAdmin: boolean;
+  notificationTokens: unknown[];
+}
+
 export class FioraClient {
   private _socket = IO('https://fiora.suisuijiang.com', {
     autoConnect: false,
     transports: ['websocket'],
     extraHeaders: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       Origin: 'https://fiora.suisuijiang.com',
     },
   } as any);
   private isSeal = false;
+  private _userInfo: FioraUserInfo | null = null;
 
-  constructor() {
+  constructor(private context: vscode.ExtensionContext) {
     this._socket.on('connect', () => {
       console.log('连接成功');
     });
@@ -35,6 +57,14 @@ export class FioraClient {
     this._socket.on('error', (data: any) => {
       console.log('网络出现异常', data);
     });
+  }
+
+  get isLogin(): boolean {
+    return this._socket.connected && typeof this.userInfo === 'object';
+  }
+
+  get userInfo(): FioraUserInfo | null {
+    return this._userInfo;
   }
 
   private emit(
@@ -82,12 +112,14 @@ export class FioraClient {
       password,
       os: platform(),
       browser: 'VSCode',
-      environment: `Fiora for VSCode`,
+      environment: `Fiora for VSCode - v${this.context.extension.packageJSON.version}`,
     });
 
     if (err) {
       return null;
     }
+
+    this._userInfo = user;
 
     return user;
   }

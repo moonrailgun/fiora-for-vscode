@@ -6,12 +6,8 @@
   "engines": {
     "vscode": "^1.55.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "*"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["*"],
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
@@ -37,6 +33,15 @@
         }
       ]
     },
+    "menus": {
+      "view/title": [
+        {
+          "command": "fiora-for-vscode.refresh",
+          "when": "view == fiora-chat-view || view == fiora-chat-view-explorer",
+          "group": "navigation"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "fiora-for-vscode.helloWorld",
@@ -51,7 +56,11 @@
       {
         "command": "fiora-for-vscode.refresh",
         "category": "fiora-for-vscode",
-        "title": "Refresh Message"
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/icons/light/refresh.svg",
+          "dark": "resources/icons/dark/refresh.svg"
+        }
       }
     ],
     "configuration": {

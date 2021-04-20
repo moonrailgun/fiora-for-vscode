@@ -15,13 +15,12 @@ export function activate(context: vscode.ExtensionContext) {
   // This line of code will only be executed once when your extension is activated
   output('Congratulations, your extension "fiora-for-vscode" is now active!');
 
-  register(context);
-
-  client = new FioraClient();
+  client = new FioraClient(context);
   setTimeout(async () => {
     const token = getToken();
 
     if (typeof token === 'string') {
+      // Auto Login after 1 second
       const [username, password] = token.split(':');
 
       output(`正在尝试登录账号 ${username}`);
@@ -31,6 +30,8 @@ export function activate(context: vscode.ExtensionContext) {
       output(JSON.stringify(user));
     }
   }, 1000);
+
+  register(context, client);
 }
 
 // this method is called when your extension is deactivated
