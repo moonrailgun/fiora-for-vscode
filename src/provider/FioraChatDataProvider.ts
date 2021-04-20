@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import { FioraGroupItem } from '../client';
 
-interface FioraChatDataItem {
+export interface FioraChatDataItem {
   parent?: FioraChatDataItem;
+  id?: string;
   name: string;
   unreadCount?: number;
   type: 'Container' | 'Item';
@@ -36,6 +37,7 @@ export class FioraChatDataProvider
       if (element.name === 'Group') {
         // 列出群组
         return this.groups.map((group) => ({
+          id: group._id,
           name: group.name,
           unreadCount: 0,
           type: 'Item',

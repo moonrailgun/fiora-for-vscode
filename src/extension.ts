@@ -28,6 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
       const user = await client.login(username, password);
 
       output(JSON.stringify(user));
+      vscode.commands.executeCommand('fiora-for-vscode.refresh');
     }
   }, 1000);
 

@@ -1,10 +1,14 @@
 import * as vscode from 'vscode';
 import type { FioraClient } from './client';
-import { FioraChatDataProvider } from './provider/FioraChatDataProvider';
+import {
+  FioraChatDataItem,
+  FioraChatDataProvider,
+} from './provider/FioraChatDataProvider';
 import { getToken, saveToken } from './storage';
 import * as fs from 'fs';
 import * as path from 'path';
 import { fetchIcon, urlExt } from './utils';
+import { openConverseOutput } from './streams';
 
 export function register(
   context: vscode.ExtensionContext,
@@ -14,12 +18,40 @@ export function register(
   const fioraChatView = vscode.window.createTreeView('fiora-chat-view', {
     treeDataProvider: provider,
   });
+
+  function openConverse(converseInfo: FioraChatDataItem) {
+    if (typeof converseInfo.id === 'string') {
+      openConverseOutput(context, converseInfo.id, converseInfo.name);
+    }
+  }
+
+  function selectionChanged(
+    e: vscode.TreeViewSelectionChangeEvent<FioraChatDataItem>
+  ) {
+    const firstSelection = e.selection[0];
+    if (typeof firstSelection === 'object') {
+      if (
+        firstSelection.type === 'Item' &&
+        typeof firstSelection.id === 'string'
+      ) {
+        openConverse(firstSelection);
+      }
+    }
+  }
+
   context.subscriptions.push(fioraChatView);
+  context.subscriptions.push(
+    fioraChatView.onDidChangeSelection(selectionChanged)
+  );
+
   const fioraChatExplorerView = vscode.window.createTreeView(
     'fiora-chat-view-explorer',
     { treeDataProvider: provider }
   );
   context.subscriptions.push(fioraChatExplorerView);
+  context.subscriptions.push(
+    fioraChatExplorerView.onDidChangeSelection(selectionChanged)
+  );
 
   function refresh() {
     if (!client.isLogin) {

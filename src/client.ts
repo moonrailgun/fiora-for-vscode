@@ -2,6 +2,7 @@ import * as IO from 'socket.io-client';
 import * as vscode from 'vscode';
 import { SealText, SealUserTimeout } from './const';
 import { platform } from 'os';
+import { output } from './logger';
 
 export interface FioraGroupItem {
   _id: string;
@@ -23,6 +24,15 @@ export interface FioraUserInfo {
   notificationTokens: unknown[];
 }
 
+export interface FioraMessageItem {
+  _id: string;
+  createTime: string;
+  from: Pick<FioraUserInfo, '_id' | 'tag' | 'username' | 'avatar'>;
+  to: string;
+  type: 'text';
+  content: string;
+}
+
 export class FioraClient {
   private _socket = IO('https://fiora.suisuijiang.com', {
     autoConnect: false,
@@ -34,6 +44,7 @@ export class FioraClient {
   } as any);
   private isSeal = false;
   private _userInfo: FioraUserInfo | null = null;
+  messageList: Record<string, FioraMessageItem> = {};
 
   constructor(private context: vscode.ExtensionContext) {
     this._socket.on('connect', () => {
@@ -120,8 +131,23 @@ export class FioraClient {
     }
 
     this._userInfo = user;
+    this.initListener();
 
     return user;
+  }
+
+  initListener() {
+    if (this._socket.connected !== true) {
+      output('Init Listener failed, socket disconnected');
+      return;
+    }
+
+    this._socket.on('message', (message: FioraMessageItem) => {
+      // Received chat message
+      this.messageList[message.to] = message;
+
+      output(JSON.stringify(message));
+    });
   }
 
   close() {
