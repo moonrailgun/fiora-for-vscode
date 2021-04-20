@@ -21,7 +21,7 @@ export function register(
 
   function openConverse(converseInfo: FioraChatDataItem) {
     if (typeof converseInfo.id === 'string') {
-      openConverseOutput(context, converseInfo.id, converseInfo.name);
+      openConverseOutput(context, client, converseInfo.id, converseInfo.name);
     }
   }
 

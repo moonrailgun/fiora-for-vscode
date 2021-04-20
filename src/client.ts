@@ -44,7 +44,8 @@ export class FioraClient {
   } as any);
   private isSeal = false;
   private _userInfo: FioraUserInfo | null = null;
-  messageList: Record<string, FioraMessageItem> = {};
+  messageList: Record<string, FioraMessageItem[]> = {};
+  messageSub = new vscode.EventEmitter<FioraMessageItem>();
 
   constructor(private context: vscode.ExtensionContext) {
     this._socket.on('connect', () => {
@@ -136,6 +137,22 @@ export class FioraClient {
     return user;
   }
 
+  // Just for test
+  sendTestMsg() {
+    const message = {
+      from: { username: 'test' } as any,
+      to: '5adacdcfa109ce59da3e83d3', // for Fiora default group id
+      content: 'This is a Test message',
+    } as any;
+
+    if (!Array.isArray(this.messageList[message.to])) {
+      this.messageList[message.to] = [];
+    }
+    this.messageList[message.to].push(message);
+
+    this.messageSub.fire(message);
+  }
+
   initListener() {
     if (this._socket.connected !== true) {
       output('Init Listener failed, socket disconnected');
@@ -144,7 +161,12 @@ export class FioraClient {
 
     this._socket.on('message', (message: FioraMessageItem) => {
       // Received chat message
-      this.messageList[message.to] = message;
+      if (!Array.isArray(this.messageList[message.to])) {
+        this.messageList[message.to] = [];
+      }
+      this.messageList[message.to].push(message);
+
+      this.messageSub.fire(message);
 
       output(JSON.stringify(message));
     });
