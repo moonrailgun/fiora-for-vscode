@@ -2,7 +2,7 @@
   "name": "fiora-for-vscode",
   "displayName": "fiora-for-vscode",
   "description": "A VSCode Extension which bring fiora into your workspace.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "moonrailgun",
   "engines": {
     "vscode": "^1.55.0"
