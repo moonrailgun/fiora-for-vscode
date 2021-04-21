@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export function saveToken(token: string): Thenable<void> {
-  const encoded = Buffer.from(token).toString('base64');
+  const encoded = Buffer.from(token, 'utf8').toString('base64');
 
   return vscode.workspace
     .getConfiguration('fiora-for-vscode')
@@ -13,7 +13,7 @@ export function getToken(): string | undefined {
     .getConfiguration('fiora-for-vscode')
     .get<string>('token');
   if (typeof oldToken === 'string') {
-    oldToken = Buffer.from(oldToken, 'base64').toString('ascii');
+    oldToken = Buffer.from(oldToken, 'base64').toString('utf8');
   }
 
   return oldToken;
