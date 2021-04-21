@@ -48,29 +48,41 @@ export class FioraClient {
   private _userInfo: FioraUserInfo | null = null;
   messageList: Record<string, FioraMessageItem[]> = {};
   messageSub = new vscode.EventEmitter<FioraMessageItem>();
+  stateSub = new vscode.EventEmitter<string>();
 
   constructor(private context: vscode.ExtensionContext) {
     this._socket.on('connect', () => {
       console.log('连接成功');
+      this.stateSub.fire('connect');
     });
     this._socket.on('connecting', () => {
       console.log('正在连接');
+      this.stateSub.fire('connecting');
     });
     this._socket.on('reconnect', () => {
       console.log('重连成功');
+      this.stateSub.fire('reconnect');
     });
     this._socket.on('reconnecting', (data: any) => {
       console.log('重连中...', this._socket.io.uri, data);
+      this.stateSub.fire('reconnecting');
     });
     this._socket.on('disconnect', () => {
       console.log('已断开连接');
+      this.stateSub.fire('disconnect');
     });
     this._socket.on('connect_failed', () => {
       console.log('连接失败');
+      this.stateSub.fire('connect_failed');
     });
     this._socket.on('error', (data: any) => {
       console.log('网络出现异常', data);
+      this.stateSub.fire('error');
     });
+  }
+
+  get isConnected(): boolean {
+    return this._socket.connected;
   }
 
   get isLogin(): boolean {

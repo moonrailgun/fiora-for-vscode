@@ -21,12 +21,17 @@ export class FioraChatDataProvider
   > = this._onDidChangeTreeData.event;
   private groups: FioraGroupItem[] = [];
   private icons: Record<string, string> = {};
+  private isEmpty = false;
 
   constructor(private _context: vscode.ExtensionContext) {}
 
   getChildren(
     element?: FioraChatViewTreeItem
   ): vscode.ProviderResult<FioraChatViewTreeItem[]> {
+    if (this.isEmpty) {
+      return null;
+    }
+
     if (!element) {
       // Root
       return [
@@ -94,6 +99,11 @@ export class FioraChatDataProvider
 
   setIcons(icons: Record<string, string>) {
     this.icons = icons;
+  }
+
+  setIsEmpty(isEmpty = false) {
+    this.isEmpty = isEmpty;
+    this.refresh();
   }
 
   refresh() {

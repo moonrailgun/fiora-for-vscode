@@ -16,6 +16,14 @@ export function register(
   client: FioraClient
 ) {
   const provider = new FioraChatDataProvider(context);
+  client.stateSub.event(() => {
+    if (!client.isConnected) {
+      provider.setIsEmpty(true);
+    } else {
+      provider.setIsEmpty(false);
+    }
+  });
+
   const fioraChatView = vscode.window.createTreeView('fiora-chat-view', {
     treeDataProvider: provider,
   });
@@ -163,6 +171,23 @@ export function register(
   context.subscriptions.push(
     vscode.commands.registerCommand('fiora-for-vscode.openWebsite', () => {
       vscode.env.openExternal(vscode.Uri.parse(client.serviceUrl));
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('fiora-for-vscode.connect', async () => {
+      // Connect means relogin
+      const token = getToken();
+      if (typeof token === 'string') {
+        const user = await client.loginByToken(token);
+
+        if (user !== null) {
+          vscode.commands.executeCommand('fiora-for-vscode.refresh');
+          return;
+        }
+      }
+
+      vscode.commands.executeCommand('fiora-for-vscode.login');
     })
   );
 }

@@ -39,6 +39,16 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "fiora-chat-view-explorer",
+        "contents": "Not connected Service.\n[Connect to Chat Service](command:fiora-for-vscode.connect)"
+      },
+      {
+        "view": "fiora-chat-view",
+        "contents": "Not connected Service.\n[Connect to Chat Service](command:fiora-for-vscode.connect)"
+      }
+    ],
     "menus": {
       "view/title": [
         {
@@ -101,6 +111,11 @@
           "light": "resources/icons/light/post.svg",
           "dark": "resources/icons/dark/post.svg"
         }
+      },
+      {
+        "command": "fiora-for-vscode.connect",
+        "category": "fiora-for-vscode",
+        "title": "Connect to Service"
       }
     ],
     "configuration": {
