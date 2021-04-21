@@ -155,10 +155,7 @@ export class FioraClient {
       content: 'This is a Test message',
     } as any;
 
-    if (!Array.isArray(this.messageList[message.to])) {
-      this.messageList[message.to] = [];
-    }
-    this.messageList[message.to].push(message);
+    this.appendMessage(message.to, message);
 
     this.messageSub.fire(message);
   }
@@ -171,15 +168,18 @@ export class FioraClient {
 
     this._socket.on('message', (message: FioraMessageItem) => {
       // Received chat message
-      if (!Array.isArray(this.messageList[message.to])) {
-        this.messageList[message.to] = [];
-      }
-      this.messageList[message.to].push(message);
-
+      this.appendMessage(message.to, message);
       this.messageSub.fire(message);
 
       output(JSON.stringify(message));
     });
+  }
+
+  appendMessage(to: string, message: FioraMessageItem) {
+    if (!Array.isArray(this.messageList[to])) {
+      this.messageList[to] = [];
+    }
+    this.messageList[to].push(message);
   }
 
   async fetchLinkmansLastMessagesV2(linkmanIds: string[]) {
@@ -202,6 +202,22 @@ export class FioraClient {
         }
         this.messageList[linkmanId].unshift(...lastMessages.messages);
       });
+    }
+  }
+
+  /**
+   * Send pure text message
+   */
+  async sendTextMessage(to: string, content: string) {
+    const [error, message] = await this.emit<FioraMessageItem>('sendMessage', {
+      to,
+      type: 'text',
+      content,
+    });
+
+    if (error === null && message !== null) {
+      this.appendMessage(message.to, message);
+      this.messageSub.fire(message);
     }
   }
 

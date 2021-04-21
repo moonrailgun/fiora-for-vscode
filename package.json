@@ -61,6 +61,11 @@
           "light": "resources/icons/light/refresh.svg",
           "dark": "resources/icons/dark/refresh.svg"
         }
+      },
+      {
+        "command": "fiora-for-vscode.sendMessage",
+        "category": "fiora-for-vscode",
+        "title": "Send Message to Fiora"
       }
     ],
     "configuration": {

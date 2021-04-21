@@ -18,9 +18,11 @@ export function register(
   const fioraChatView = vscode.window.createTreeView('fiora-chat-view', {
     treeDataProvider: provider,
   });
+  let currentSelectedConverseItem: FioraChatViewTreeItem | null = null;
 
   function openConverse(converseInfo: FioraChatViewTreeItem) {
     if (typeof converseInfo.id === 'string') {
+      currentSelectedConverseItem = converseInfo;
       openConverseOutput(context, client, converseInfo.id, converseInfo.name);
     }
   }
@@ -125,5 +127,31 @@ export function register(
         });
       }
     })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'fiora-for-vscode.sendMessage',
+      async () => {
+        if (currentSelectedConverseItem === null) {
+          vscode.window.showErrorMessage('请先选择一个发送方');
+          return;
+        }
+
+        if (typeof currentSelectedConverseItem.id !== 'string') {
+          vscode.window.showErrorMessage('会话数据异常');
+          return;
+        }
+
+        const message = await vscode.window.showInputBox({
+          placeHolder: '随便聊点啥吧',
+          prompt: `发送消息到 ${currentSelectedConverseItem.name}`,
+        });
+        if (typeof message === 'string') {
+          await client.sendTextMessage(currentSelectedConverseItem.id, message);
+          vscode.window.showInformationMessage('发送成功');
+        }
+      }
+    )
   );
 }
