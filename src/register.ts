@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fetchIcon, urlExt } from './utils';
 import { openConverseOutput } from './streams';
+import { output } from './logger';
 
 export function register(
   context: vscode.ExtensionContext,
@@ -58,6 +59,7 @@ export function register(
   function refresh() {
     if (!client.isLogin) {
       vscode.commands.executeCommand('fiora-for-vscode.login');
+      output('尚未登录');
       return;
     }
 
@@ -122,9 +124,13 @@ export function register(
           return;
         }
 
-        saveToken(token).then(() => {
-          vscode.window.showInformationMessage('设置用户名密码成功');
-        });
+        const [username, password] = token.split(':');
+        const user = await client.login(username, password);
+
+        if (user !== null) {
+          saveToken(user.token);
+          vscode.commands.executeCommand('fiora-for-vscode.refresh');
+        }
       }
     })
   );

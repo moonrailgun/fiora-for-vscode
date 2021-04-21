@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { SealText, SealUserTimeout } from './const';
 import { platform } from 'os';
 import { output } from './logger';
+import { once } from 'lodash';
 
 export interface FioraGroupItem {
   _id: string;
@@ -79,6 +80,18 @@ export class FioraClient {
     return this._userInfo;
   }
 
+  get os() {
+    return platform();
+  }
+
+  get browser() {
+    return 'VSCode';
+  }
+
+  get environment() {
+    return `Fiora for VSCode - v${this.context.extension.packageJSON.version}`;
+  }
+
   /**
    *
    * @returns [err, result]
@@ -123,14 +136,42 @@ export class FioraClient {
     });
   }
 
-  async login(username: string, password: string) {
+  async login(
+    username: string,
+    password: string
+  ): Promise<FioraUserInfo | null> {
     const [err, user] = await this.emit<FioraUserInfo>('login', {
       username,
       password,
-      os: platform(),
-      browser: 'VSCode',
-      environment: `Fiora for VSCode - v${this.context.extension.packageJSON.version}`,
+      os: this.os,
+      browser: this.browser,
+      environment: this.environment,
     });
+
+    if (err) {
+      return null;
+    }
+
+    this._userInfo = user;
+    this.initListener();
+    await this.fetchLinkmansLastMessagesV2(
+      user?.groups.map((g) => g._id) ?? []
+    );
+
+    return user;
+  }
+
+  async loginByToken(token: string): Promise<FioraUserInfo | null> {
+    const [err, user] = await this.emit<FioraUserInfo>(
+      'loginByToken',
+      {
+        token,
+        os: this.os,
+        browser: this.browser,
+        environment: this.environment,
+      },
+      { toast: false }
+    );
 
     if (err) {
       return null;
@@ -160,7 +201,7 @@ export class FioraClient {
     this.messageSub.fire(message);
   }
 
-  initListener() {
+  initListener = once(() => {
     if (this._socket.connected !== true) {
       output('Init Listener failed, socket disconnected');
       return;
@@ -173,7 +214,7 @@ export class FioraClient {
 
       output(JSON.stringify(message));
     });
-  }
+  });
 
   appendMessage(to: string, message: FioraMessageItem) {
     if (!Array.isArray(this.messageList[to])) {

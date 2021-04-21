@@ -9,12 +9,12 @@ export function saveToken(token: string): Thenable<void> {
 }
 
 export function getToken(): string | undefined {
-  let oldToken = vscode.workspace
+  let token = vscode.workspace
     .getConfiguration('fiora-for-vscode')
     .get<string>('token');
-  if (typeof oldToken === 'string') {
-    oldToken = Buffer.from(oldToken, 'base64').toString('utf8');
+  if (typeof token === 'string') {
+    token = Buffer.from(token, 'base64').toString('utf8');
   }
 
-  return oldToken;
+  return token;
 }

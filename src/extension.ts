@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { FioraClient } from './client';
 import { output } from './logger';
 import { register } from './register';
-import { getToken } from './storage';
+import { getToken, saveToken } from './storage';
 
 let client: FioraClient;
 
@@ -21,14 +21,18 @@ export function activate(context: vscode.ExtensionContext) {
 
     if (typeof token === 'string') {
       // Auto Login after 1 second
-      const [username, password] = token.split(':');
+      output(`正在自动登录`);
 
-      output(`正在尝试登录账号 ${username}`);
+      const user = await client.loginByToken(token);
 
-      const user = await client.login(username, password);
-
-      output(JSON.stringify(user));
-      vscode.commands.executeCommand('fiora-for-vscode.refresh');
+      if (user !== null) {
+        output('自动登录成功');
+        // TODO: fiora not provide a API for token renew
+        // saveToken(user.token);
+        vscode.commands.executeCommand('fiora-for-vscode.refresh');
+      } else {
+        output('自动登录失败');
+      }
     }
   }, 1000);
 
