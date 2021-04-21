@@ -76,6 +76,8 @@ export class FioraChatDataProvider
       treeItem.iconPath = element.icon;
     }
 
+    treeItem.contextValue = element.type;
+
     return treeItem;
   }
 

@@ -135,23 +135,25 @@ export function register(
   context.subscriptions.push(
     vscode.commands.registerCommand(
       'fiora-for-vscode.sendMessage',
-      async () => {
-        if (currentSelectedConverseItem === null) {
+      async (selectedItem?: FioraChatViewTreeItem) => {
+        const target = selectedItem ?? currentSelectedConverseItem ?? null;
+
+        if (target === null) {
           vscode.window.showErrorMessage('请先选择一个发送方');
           return;
         }
 
-        if (typeof currentSelectedConverseItem.id !== 'string') {
+        if (typeof target.id !== 'string') {
           vscode.window.showErrorMessage('会话数据异常');
           return;
         }
 
         const message = await vscode.window.showInputBox({
           placeHolder: '随便聊点啥吧',
-          prompt: `发送消息到 ${currentSelectedConverseItem.name}`,
+          prompt: `发送消息到 ${target.name}`,
         });
         if (typeof message === 'string') {
-          await client.sendTextMessage(currentSelectedConverseItem.id, message);
+          await client.sendTextMessage(target.id, message);
           vscode.window.showInformationMessage('发送成功');
         }
       }

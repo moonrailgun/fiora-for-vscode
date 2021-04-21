@@ -56,6 +56,13 @@
           "when": "view == fiora-chat-view || view == fiora-chat-view-explorer",
           "group": "navigation"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "fiora-for-vscode.sendMessage",
+          "when": "view == fiora-chat-view && viewItem == Item || view == fiora-chat-view-explorer && viewItem == Item",
+          "group": "inline"
+        }
       ]
     },
     "commands": [
@@ -89,7 +96,11 @@
       {
         "command": "fiora-for-vscode.sendMessage",
         "category": "fiora-for-vscode",
-        "title": "Send Message to Fiora"
+        "title": "Send Message to Fiora",
+        "icon": {
+          "light": "resources/icons/light/post.svg",
+          "dark": "resources/icons/dark/post.svg"
+        }
       }
     ],
     "configuration": {
