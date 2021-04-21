@@ -13,7 +13,7 @@ export function getToken(): string | undefined {
     .getConfiguration('fiora-for-vscode')
     .get<string>('token');
   if (typeof oldToken === 'string') {
-    oldToken = Buffer.from(oldToken, 'base64').toString('ascii');
+    oldToken = Buffer.from(oldToken, 'base64').toString('utf8');
   }
 
   return oldToken;
