@@ -31,7 +31,8 @@ export function openConverseOutput(
       outputChannel.appendLine(`[${msg.from.username}]: ${msg.content}`);
     });
   }
-  client.sendTestMsg(); // For test
+
+  // client.sendTestMsg(); // For test
 
   outputChannel.show(true);
 }

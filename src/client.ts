@@ -29,7 +29,7 @@ export interface FioraMessageItem {
   createTime: string;
   from: Pick<FioraUserInfo, '_id' | 'tag' | 'username' | 'avatar'>;
   to: string;
-  type: 'text';
+  type: 'text' | 'image' | 'code' | 'invite';
   content: string;
 }
 
@@ -79,11 +79,15 @@ export class FioraClient {
     return this._userInfo;
   }
 
-  private emit(
+  /**
+   *
+   * @returns [err, result]
+   */
+  private emit<T = any>(
     eventName: string,
     data: {},
     { toast = true } = {}
-  ): Promise<[any, any]> {
+  ): Promise<[any, T | null]> {
     if (this._socket.connected === false) {
       this._socket.connect();
     }
@@ -96,6 +100,7 @@ export class FioraClient {
     return new Promise((resolve) => {
       this._socket.emit(eventName, data, (res: any) => {
         if (typeof res === 'string') {
+          // Error
           if (toast) {
             vscode.window.showErrorMessage(res);
           }
@@ -119,7 +124,7 @@ export class FioraClient {
   }
 
   async login(username: string, password: string) {
-    const [err, user] = await this.emit('login', {
+    const [err, user] = await this.emit<FioraUserInfo>('login', {
       username,
       password,
       os: platform(),
@@ -133,11 +138,16 @@ export class FioraClient {
 
     this._userInfo = user;
     this.initListener();
+    await this.fetchLinkmansLastMessagesV2(
+      user?.groups.map((g) => g._id) ?? []
+    );
 
     return user;
   }
 
-  // Just for test
+  /**
+   * Just for test
+   */
   sendTestMsg() {
     const message = {
       from: { username: 'test' } as any,
@@ -170,6 +180,29 @@ export class FioraClient {
 
       output(JSON.stringify(message));
     });
+  }
+
+  async fetchLinkmansLastMessagesV2(linkmanIds: string[]) {
+    if (Array.isArray(linkmanIds) && linkmanIds.length > 0) {
+      const [, data] = await this.emit<
+        Record<
+          string,
+          {
+            messages: FioraMessageItem[];
+            unread: number;
+          }
+        >
+      >('getLinkmansLastMessagesV2', {
+        linkmans: linkmanIds,
+      });
+
+      Object.entries(data ?? {}).forEach(([linkmanId, lastMessages]) => {
+        if (!Array.isArray(this.messageList[linkmanId])) {
+          this.messageList[linkmanId] = [];
+        }
+        this.messageList[linkmanId].unshift(...lastMessages.messages);
+      });
+    }
   }
 
   close() {

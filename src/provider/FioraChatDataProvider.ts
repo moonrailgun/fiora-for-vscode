@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { FioraGroupItem } from '../client';
 
-export interface FioraChatDataItem {
-  parent?: FioraChatDataItem;
+export interface FioraChatViewTreeItem {
+  parent?: FioraChatViewTreeItem;
   id?: string;
   name: string;
   unreadCount?: number;
@@ -11,13 +11,13 @@ export interface FioraChatDataItem {
 }
 
 export class FioraChatDataProvider
-  implements vscode.TreeDataProvider<FioraChatDataItem> {
+  implements vscode.TreeDataProvider<FioraChatViewTreeItem> {
   /**
    * Fiora 列表数据提供器
    */
-  private _onDidChangeTreeData = new vscode.EventEmitter<FioraChatDataItem | void>();
+  private _onDidChangeTreeData = new vscode.EventEmitter<FioraChatViewTreeItem | void>();
   onDidChangeTreeData: vscode.Event<
-    FioraChatDataItem | undefined | null | void
+    FioraChatViewTreeItem | undefined | null | void
   > = this._onDidChangeTreeData.event;
   private groups: FioraGroupItem[] = [];
   private icons: Record<string, string> = {};
@@ -25,13 +25,13 @@ export class FioraChatDataProvider
   constructor(private _context: vscode.ExtensionContext) {}
 
   getChildren(
-    element?: FioraChatDataItem
-  ): vscode.ProviderResult<FioraChatDataItem[]> {
+    element?: FioraChatViewTreeItem
+  ): vscode.ProviderResult<FioraChatViewTreeItem[]> {
     if (!element) {
       // Root
       return [
         { name: 'Group', unreadCount: 0, type: 'Container' },
-        { name: 'DM', unreadCount: 0, type: 'Container' },
+        // { name: 'DM', unreadCount: 0, type: 'Container' },
       ];
     } else {
       if (element.name === 'Group') {
@@ -59,7 +59,7 @@ export class FioraChatDataProvider
   }
 
   getTreeItem(
-    element: FioraChatDataItem
+    element: FioraChatViewTreeItem
   ): vscode.TreeItem | Thenable<vscode.TreeItem> {
     const treeItem = new vscode.TreeItem(element.name);
     treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
@@ -80,8 +80,8 @@ export class FioraChatDataProvider
   }
 
   getParent(
-    element: FioraChatDataItem
-  ): vscode.ProviderResult<FioraChatDataItem> {
+    element: FioraChatViewTreeItem
+  ): vscode.ProviderResult<FioraChatViewTreeItem> {
     return element ? element.parent : undefined;
   }
 

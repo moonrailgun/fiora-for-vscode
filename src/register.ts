@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import type { FioraClient } from './client';
 import {
-  FioraChatDataItem,
+  FioraChatViewTreeItem,
   FioraChatDataProvider,
 } from './provider/FioraChatDataProvider';
 import { getToken, saveToken } from './storage';
@@ -19,14 +19,14 @@ export function register(
     treeDataProvider: provider,
   });
 
-  function openConverse(converseInfo: FioraChatDataItem) {
+  function openConverse(converseInfo: FioraChatViewTreeItem) {
     if (typeof converseInfo.id === 'string') {
       openConverseOutput(context, client, converseInfo.id, converseInfo.name);
     }
   }
 
   function selectionChanged(
-    e: vscode.TreeViewSelectionChangeEvent<FioraChatDataItem>
+    e: vscode.TreeViewSelectionChangeEvent<FioraChatViewTreeItem>
   ) {
     const firstSelection = e.selection[0];
     if (typeof firstSelection === 'object') {
