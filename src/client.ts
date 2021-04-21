@@ -35,12 +35,13 @@ export interface FioraMessageItem {
 }
 
 export class FioraClient {
-  private _socket = IO('https://fiora.suisuijiang.com', {
+  serviceUrl = 'https://fiora.suisuijiang.com';
+  private _socket = IO(this.serviceUrl, {
     autoConnect: false,
     transports: ['websocket'],
     extraHeaders: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      Origin: 'https://fiora.suisuijiang.com',
+      Origin: this.serviceUrl,
     },
   } as any);
   private isSeal = false;

@@ -109,11 +109,8 @@ export function register(
   // Login
   context.subscriptions.push(
     vscode.commands.registerCommand('fiora-for-vscode.login', async () => {
-      const oldToken = getToken();
-
       const token = await vscode.window.showInputBox({
         placeHolder: 'username:password',
-        value: oldToken,
         prompt: '请输入 Fiora 的用户名密码, 格式为 username:password',
       });
 
@@ -159,5 +156,11 @@ export function register(
         }
       }
     )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('fiora-for-vscode.openWebsite', () => {
+      vscode.env.openExternal(vscode.Uri.parse(client.serviceUrl));
+    })
   );
 }

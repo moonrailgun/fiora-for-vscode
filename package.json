@@ -42,6 +42,16 @@
     "menus": {
       "view/title": [
         {
+          "command": "fiora-for-vscode.openWebsite",
+          "when": "view == fiora-chat-view || view == fiora-chat-view-explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "fiora-for-vscode.login",
+          "when": "view == fiora-chat-view || view == fiora-chat-view-explorer",
+          "group": "navigation"
+        },
+        {
           "command": "fiora-for-vscode.refresh",
           "when": "view == fiora-chat-view || view == fiora-chat-view-explorer",
           "group": "navigation"
@@ -50,14 +60,22 @@
     },
     "commands": [
       {
-        "command": "fiora-for-vscode.helloWorld",
+        "command": "fiora-for-vscode.openWebsite",
         "category": "fiora-for-vscode",
-        "title": "Hello World"
+        "title": "Open Fiora Website",
+        "icon": {
+          "light": "resources/icons/light/web.svg",
+          "dark": "resources/icons/dark/web.svg"
+        }
       },
       {
         "command": "fiora-for-vscode.login",
         "category": "fiora-for-vscode",
-        "title": "Login Fiora"
+        "title": "Login Fiora",
+        "icon": {
+          "light": "resources/icons/light/user.svg",
+          "dark": "resources/icons/dark/user.svg"
+        }
       },
       {
         "command": "fiora-for-vscode.refresh",
