@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { FioraClient } from './client';
 import { output } from './logger';
 import { register } from './register';
-import { getToken, saveToken } from './storage';
+import { getToken } from './storage';
 
 let client: FioraClient;
 
@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   client = new FioraClient(context);
   setTimeout(async () => {
-    const token = getToken();
+    const token = await getToken(context);
 
     if (typeof token === 'string') {
       // Auto Login after 1 second

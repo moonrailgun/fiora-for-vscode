@@ -133,7 +133,7 @@ export function register(
         const user = await client.login(username, password);
 
         if (user !== null) {
-          saveToken(user.token);
+          saveToken(context, user.token);
           vscode.commands.executeCommand('fiora-for-vscode.refresh');
         }
       }
@@ -218,7 +218,7 @@ export function register(
   context.subscriptions.push(
     vscode.commands.registerCommand('fiora-for-vscode.connect', async () => {
       // Connect means relogin
-      const token = getToken();
+      const token = await getToken(context);
       if (typeof token === 'string') {
         const user = await client.loginByToken(token);
 

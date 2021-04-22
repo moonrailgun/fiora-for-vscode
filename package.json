@@ -128,18 +128,7 @@
         "category": "fiora-for-vscode",
         "title": "Connect to Service"
       }
-    ],
-    "configuration": {
-      "type": "object",
-      "title": "Fiora for Vscode",
-      "properties": {
-        "fiora-for-vscode.token": {
-          "type": "string",
-          "description": "Your Fiora Token",
-          "default": ""
-        }
-      }
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
