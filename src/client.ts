@@ -189,6 +189,7 @@ export class FioraClient {
     );
 
     if (err) {
+      output('loginByToken error:' + String(err));
       return null;
     }
 

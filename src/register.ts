@@ -163,6 +163,7 @@ export function register(
         if (typeof message === 'string') {
           await client.sendTextMessage(target.id, message);
           vscode.window.showInformationMessage('发送成功');
+          openConverse(target);
         }
       }
     )
@@ -202,6 +203,7 @@ export function register(
         if (typeof code === 'string') {
           client.sendTextMessage(target.id, message, 'code');
           vscode.window.showInformationMessage('发送成功');
+          openConverse(target);
         }
       }
     )
