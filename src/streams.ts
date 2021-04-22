@@ -2,11 +2,14 @@ import * as vscode from 'vscode';
 import { FioraClient, FioraMessageItem } from './client';
 import { get } from 'lodash';
 import { URL } from 'url';
+import { unescape } from 'lodash';
 
 const outputChannels: Record<string, vscode.OutputChannel> = {};
 
 function formatMessage(client: FioraClient, msg: FioraMessageItem) {
-  if (msg.type === 'image' && msg.content.startsWith('//')) {
+  if (msg.type === 'text') {
+    return `[${msg.from.username}]: ${unescape(msg.content)}`;
+  } else if (msg.type === 'image' && msg.content.startsWith('//')) {
     const url = client.serviceUrl ? new URL(client.serviceUrl) : null;
     const protocol = url?.protocol ?? 'https:';
     return `[${msg.from.username}]: ${protocol}${msg.content}`;
