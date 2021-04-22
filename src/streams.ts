@@ -1,8 +1,18 @@
 import * as vscode from 'vscode';
-import { FioraClient } from './client';
+import { FioraClient, FioraMessageItem } from './client';
 import { get } from 'lodash';
+import { URL } from 'url';
 
 const outputChannels: Record<string, vscode.OutputChannel> = {};
+
+function formatMessage(client: FioraClient, msg: FioraMessageItem) {
+  if (msg.type === 'image' && msg.content.startsWith('//')) {
+    const url = client.serviceUrl ? new URL(client.serviceUrl) : null;
+    const protocol = url?.protocol ?? 'https:';
+    return `[${msg.from.username}]: ${protocol}${msg.content}`;
+  }
+  return `[${msg.from.username}]: ${msg.content}`;
+}
 
 export function openConverseOutput(
   context: vscode.ExtensionContext,
@@ -33,7 +43,7 @@ export function openConverseOutput(
     // Listen to message
     client.messageSub.event((msg) => {
       if (msg.to === converseId) {
-        outputChannel.appendLine(`[${msg.from.username}]: ${msg.content}`);
+        outputChannel.appendLine(formatMessage(client, msg));
 
         if (typeof channelId === 'string') {
           const findedTextEditor = vscode.window.visibleTextEditors.find(
@@ -48,7 +58,7 @@ export function openConverseOutput(
 
     // Init old message
     client.messageList[converseId].forEach((msg) => {
-      outputChannel.appendLine(`[${msg.from.username}]: ${msg.content}`);
+      outputChannel.appendLine(formatMessage(client, msg));
     });
   }
 
