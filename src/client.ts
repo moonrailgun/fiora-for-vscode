@@ -25,12 +25,14 @@ export interface FioraUserInfo {
   notificationTokens: unknown[];
 }
 
+export type FioraMessageType = 'text' | 'image' | 'code' | 'invite';
+
 export interface FioraMessageItem {
   _id: string;
   createTime: string;
   from: Pick<FioraUserInfo, '_id' | 'tag' | 'username' | 'avatar'>;
   to: string;
-  type: 'text' | 'image' | 'code' | 'invite';
+  type: FioraMessageType;
   content: string;
 }
 
@@ -262,10 +264,14 @@ export class FioraClient {
   /**
    * Send pure text message
    */
-  async sendTextMessage(to: string, content: string) {
+  async sendTextMessage(
+    to: string,
+    content: string,
+    type: FioraMessageType = 'text'
+  ) {
     const [error, message] = await this.emit<FioraMessageItem>('sendMessage', {
       to,
-      type: 'text',
+      type,
       content,
     });
 

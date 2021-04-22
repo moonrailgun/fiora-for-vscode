@@ -169,6 +169,45 @@ export function register(
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'fiora-for-vscode.sendSelectionMessage',
+      () => {
+        const target = currentSelectedConverseItem ?? null;
+
+        if (target === null) {
+          vscode.window.showErrorMessage('请先选择一个发送方');
+          return;
+        }
+
+        if (typeof target.id !== 'string') {
+          vscode.window.showErrorMessage('会话数据异常');
+          return;
+        }
+
+        if (!vscode.window.activeTextEditor) {
+          vscode.window.showErrorMessage('需要激活文本编辑窗口才能使用该功能');
+          return;
+        }
+        const code = vscode.window.activeTextEditor.document.getText(
+          vscode.window.activeTextEditor.selection
+        );
+        if (code === '') {
+          vscode.window.showErrorMessage('需要选中文本');
+          return;
+        }
+
+        const language = vscode.window.activeTextEditor.document.languageId;
+        const message = `@language=${language}@${code}`;
+
+        if (typeof code === 'string') {
+          client.sendTextMessage(target.id, message, 'code');
+          vscode.window.showInformationMessage('发送成功');
+        }
+      }
+    )
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand('fiora-for-vscode.openWebsite', () => {
       vscode.env.openExternal(vscode.Uri.parse(client.serviceUrl));
     })

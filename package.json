@@ -73,6 +73,12 @@
           "when": "view == fiora-chat-view && viewItem == Item || view == fiora-chat-view-explorer && viewItem == Item",
           "group": "inline"
         }
+      ],
+      "editor/context": [
+        {
+          "command": "fiora-for-vscode.sendSelectionMessage",
+          "when": "editorFocus && editorHasSelection"
+        }
       ]
     },
     "commands": [
@@ -111,6 +117,11 @@
           "light": "resources/icons/light/post.svg",
           "dark": "resources/icons/dark/post.svg"
         }
+      },
+      {
+        "command": "fiora-for-vscode.sendSelectionMessage",
+        "category": "fiora-for-vscode",
+        "title": "Send Selection Code as Message to Fiora"
       },
       {
         "command": "fiora-for-vscode.connect",
