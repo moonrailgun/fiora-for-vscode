@@ -32,6 +32,21 @@ This extension contributes the following settings:
 * `myExtension.enable`: enable/disable this extension
 * `myExtension.thing`: set to `blah` to do something -->
 
+## Usage
+
+### You can send your own shortcuts by yourself
+
+for example:
+
+**keybindings.json**
+
+```json
+  {
+    "key": "ctrl+\\",
+    "command": "fiora-for-vscode.sendMessage"
+  }
+```
+
 ### For more information
 
 * [Visual Studio Code Reference](https://code.visualstudio.com/api/)
