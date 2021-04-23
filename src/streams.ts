@@ -3,18 +3,37 @@ import { FioraClient, FioraMessageItem } from './client';
 import { get } from 'lodash';
 import { URL } from 'url';
 import { unescape } from 'lodash';
+import { format } from 'date-fns';
 
 const outputChannels: Record<string, vscode.OutputChannel> = {};
 
+function getMessageTime(dateStr: string): string {
+  const date = new Date(dateStr);
+
+  return format(date, 'MM-dd HH:mm');
+}
+
 function formatMessage(client: FioraClient, msg: FioraMessageItem) {
+  const sendTime = getMessageTime(msg.createTime);
+  const senderName = msg.from.username;
+
   if (msg.type === 'text') {
-    return `[${msg.from.username}]: ${unescape(msg.content)}`;
+    return `[${sendTime}] ${senderName}: ${unescape(msg.content)}`;
+  } else if (msg.type === 'code') {
+    const styledCode = msg.content
+      .replace(/\n/g, '<br />')
+      .replace(/^@language=([a-z]*?)@(.*?)$/m, '\n------$1\n$2\n------')
+      .replace(/<br \/>/g, '\n');
+
+    return `[${sendTime}] ${senderName}: ${styledCode}`;
   } else if (msg.type === 'image' && msg.content.startsWith('//')) {
     const url = client.serviceUrl ? new URL(client.serviceUrl) : null;
     const protocol = url?.protocol ?? 'https:';
-    return `[${msg.from.username}]: ${protocol}${msg.content}`;
+    return `[${sendTime}] ${senderName}: ${protocol}${msg.content}`;
   }
-  return `[${msg.from.username}]: ${msg.content}`;
+
+  // Fallback
+  return `[${sendTime}] ${senderName}: ${msg.content}`;
 }
 
 export function openConverseOutput(
