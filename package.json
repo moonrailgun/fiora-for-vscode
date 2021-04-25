@@ -2,7 +2,7 @@
   "name": "fiora-for-vscode",
   "displayName": "fiora-for-vscode",
   "description": "A VSCode Extension which bring fiora into your workspace.",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "publisher": "moonrailgun",
   "engines": {
     "vscode": "^1.55.0"
@@ -11,8 +11,12 @@
     "type": "git",
     "url": "https://github.com/moonrailgun/fiora-for-vscode"
   },
-  "categories": ["Other"],
-  "activationEvents": ["*"],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./dist/extension.js",
   "icon": "resources/fiora.png",
   "contributes": {
