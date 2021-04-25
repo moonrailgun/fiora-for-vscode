@@ -16,10 +16,18 @@ export function register(
   client: FioraClient
 ) {
   const provider = new FioraChatDataProvider(context);
-  client.stateSub.event((state: string) => {
+  client.stateSub.event((state) => {
     output(`网络状态变更: ${state}`);
 
     if (!client.isConnected) {
+      provider.setIsEmpty(true);
+    } else {
+      provider.setIsEmpty(false);
+    }
+  });
+  client.loginSub.event((isLogin) => {
+    output(`登录状态变更: ${isLogin}`);
+    if (!client.isLogin) {
       provider.setIsEmpty(true);
     } else {
       provider.setIsEmpty(false);

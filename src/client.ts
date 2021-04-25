@@ -51,6 +51,7 @@ export class FioraClient {
   messageList: Record<string, FioraMessageItem[]> = {};
   messageSub = new vscode.EventEmitter<FioraMessageItem>();
   stateSub = new vscode.EventEmitter<string>();
+  loginSub = new vscode.EventEmitter<boolean>();
 
   constructor(private context: vscode.ExtensionContext) {
     this._socket.on('connect', () => {
@@ -88,7 +89,7 @@ export class FioraClient {
   }
 
   get isLogin(): boolean {
-    return this._socket.connected && typeof this.userInfo === 'object';
+    return this._socket.connected && typeof this.userInfo !== null;
   }
 
   get userInfo(): FioraUserInfo | null {
@@ -105,6 +106,10 @@ export class FioraClient {
 
   get environment() {
     return `Fiora for VSCode - v${this.context.extension.packageJSON.version}`;
+  }
+
+  notifyLoginState() {
+    this.loginSub.fire(this.isLogin);
   }
 
   /**
@@ -164,6 +169,9 @@ export class FioraClient {
     });
 
     if (err) {
+      output('login error:' + String(err));
+      this._userInfo = null;
+      this.notifyLoginState();
       return null;
     }
 
@@ -190,6 +198,8 @@ export class FioraClient {
 
     if (err) {
       output('loginByToken error:' + String(err));
+      this._userInfo = null;
+      this.notifyLoginState();
       return null;
     }
 
