@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import type { FioraClient } from './client';
+import type { FioraClient, FioraMessageType } from './client';
 import {
   FioraChatViewTreeItem,
   FioraChatDataProvider,
@@ -10,6 +10,7 @@ import * as path from 'path';
 import { fetchIcon, urlExt } from './utils';
 import { openConverseOutput } from './streams';
 import { output } from './logger';
+import { slientWhenSendMsg } from './configuration';
 
 export function register(
   context: vscode.ExtensionContext,
@@ -43,6 +44,27 @@ export function register(
     if (typeof converseInfo.id === 'string') {
       currentSelectedConverseItem = converseInfo;
       openConverseOutput(context, client, converseInfo.id, converseInfo.name);
+    }
+  }
+
+  /**
+   * Send message to fiora
+   */
+  function sendTextMessage(
+    target: FioraChatViewTreeItem,
+    message: string,
+    type: FioraMessageType = 'text'
+  ) {
+    if (typeof target.id !== 'string') {
+      vscode.window.showErrorMessage('会话数据异常');
+      return;
+    }
+
+    client.sendTextMessage(target.id, message, type);
+    openConverse(target);
+
+    if (slientWhenSendMsg() !== true) {
+      vscode.window.showInformationMessage('发送成功');
     }
   }
 
@@ -171,9 +193,7 @@ export function register(
           prompt: `发送消息到 ${target.name}`,
         });
         if (typeof message === 'string') {
-          await client.sendTextMessage(target.id, message);
-          vscode.window.showInformationMessage('发送成功');
-          openConverse(target);
+          sendTextMessage(target, message);
         }
       }
     )
@@ -211,9 +231,7 @@ export function register(
         const message = `@language=${language}@${code}`;
 
         if (typeof code === 'string') {
-          client.sendTextMessage(target.id, message, 'code');
-          vscode.window.showInformationMessage('发送成功');
-          openConverse(target);
+          sendTextMessage(target, message, 'code');
         }
       }
     )

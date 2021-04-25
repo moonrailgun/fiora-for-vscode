@@ -11,12 +11,8 @@
     "type": "git",
     "url": "https://github.com/moonrailgun/fiora-for-vscode"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "*"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["*"],
   "main": "./dist/extension.js",
   "icon": "resources/fiora.png",
   "contributes": {
@@ -132,7 +128,18 @@
         "category": "fiora-for-vscode",
         "title": "Connect to Service"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Fiora for Vscode",
+      "properties": {
+        "fiora-for-vscode.slientWhenSendMsg": {
+          "type": "boolean",
+          "description": "Dont show message box when send message",
+          "default": false
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
