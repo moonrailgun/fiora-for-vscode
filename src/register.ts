@@ -17,22 +17,26 @@ export function register(
   client: FioraClient
 ) {
   const provider = new FioraChatDataProvider(context);
+  function updateProviderState() {
+    if (!client.isConnected) {
+      provider.setIsEmpty(true);
+      return;
+    }
+    if (!client.isLogin) {
+      provider.setIsEmpty(true);
+      return;
+    }
+
+    provider.setIsEmpty(false);
+  }
   client.stateSub.event((state) => {
     output(`网络状态变更: ${state}`);
 
-    if (!client.isConnected) {
-      provider.setIsEmpty(true);
-    } else {
-      provider.setIsEmpty(false);
-    }
+    updateProviderState();
   });
   client.loginSub.event((isLogin) => {
     output(`登录状态变更: ${isLogin}`);
-    if (!client.isLogin) {
-      provider.setIsEmpty(true);
-    } else {
-      provider.setIsEmpty(false);
-    }
+    updateProviderState();
   });
 
   const fioraChatView = vscode.window.createTreeView('fiora-chat-view', {
@@ -103,41 +107,45 @@ export function register(
       return;
     }
 
-    const groups = client.userInfo!.groups;
-    let pending = groups.length;
-    const icons: Record<string, string> = {};
+    try {
+      const groups = client.userInfo!.groups;
+      let pending = groups.length;
+      const icons: Record<string, string> = {};
 
-    const storagePath = context.globalStorageUri?.fsPath ?? null;
-    if (typeof storagePath === 'string' && !fs.existsSync(storagePath)) {
-      fs.mkdirSync(storagePath);
-    }
-
-    if (typeof storagePath === 'string') {
-      // has storage path and try to fetch icons
-      function checkFinished() {
-        --pending;
-        if (pending === 0) {
-          provider.setIcons(icons);
-          provider.setListData(groups);
-        }
+      const storagePath = context.globalStorageUri?.fsPath ?? null;
+      if (typeof storagePath === 'string' && !fs.existsSync(storagePath)) {
+        fs.mkdirSync(storagePath);
       }
 
-      groups.forEach((group) => {
-        if (typeof group.avatar === 'string') {
-          const groupId = group._id.toString();
-          const filename = path.join(
-            storagePath,
-            'group_' + groupId + urlExt(group.avatar)
-          );
-          icons[groupId] = filename;
-          fetchIcon(group.avatar, filename, checkFinished);
-        } else {
-          checkFinished();
+      if (typeof storagePath === 'string') {
+        // has storage path and try to fetch icons
+        function checkFinished() {
+          --pending;
+          if (pending === 0) {
+            provider.setIcons(icons);
+            provider.setListData(groups);
+          }
         }
-      });
-    } else {
-      // Dont fetch icon
-      provider.setListData(groups);
+
+        groups.forEach((group) => {
+          if (typeof group.avatar === 'string') {
+            const groupId = group._id.toString();
+            const filename = path.join(
+              storagePath,
+              'group_' + groupId + urlExt(group.avatar)
+            );
+            icons[groupId] = filename;
+            fetchIcon(group.avatar, filename, checkFinished);
+          } else {
+            checkFinished();
+          }
+        });
+      } else {
+        // Dont fetch icon
+        provider.setListData(groups);
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -249,6 +257,8 @@ export function register(
       const token = await getToken(context);
       if (typeof token === 'string') {
         const user = await client.loginByToken(token);
+
+        console.log('user', user);
 
         if (user !== null) {
           vscode.commands.executeCommand('fiora-for-vscode.refresh');
