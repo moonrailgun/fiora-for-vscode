@@ -3,14 +3,17 @@ import { FioraClient, FioraMessageItem } from './client';
 import { get } from 'lodash';
 import { URL } from 'url';
 import { unescape } from 'lodash';
-import { format } from 'date-fns';
+import { generateShortTime } from './utils';
 
 const outputChannels: Record<string, vscode.OutputChannel> = {};
 
+/**
+ * Get Message Time
+ */
 function getMessageTime(dateStr: string): string {
   const date = new Date(dateStr);
 
-  return format(date, 'MM-dd HH:mm');
+  return generateShortTime(date);
 }
 
 function formatMessage(client: FioraClient, msg: FioraMessageItem) {

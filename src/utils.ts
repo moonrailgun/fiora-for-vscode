@@ -1,6 +1,7 @@
 import * as https from 'https';
 import * as fs from 'fs';
 import * as path from 'path';
+import { format } from 'date-fns';
 
 const fetchedIcons: Record<string, boolean> = {};
 
@@ -36,4 +37,11 @@ export function urlExt(url: string) {
     filePath = filePath.substr(0, queryIndex);
   }
   return path.extname(filePath);
+}
+
+/**
+ * Return short time
+ */
+export function generateShortTime(date = new Date()) {
+  return format(date, 'MM-dd HH:mm');
 }

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { generateShortTime } from './utils';
 
 let channel: vscode.OutputChannel | null = null;
 export function output(msg: string) {
@@ -6,5 +7,5 @@ export function output(msg: string) {
     channel = vscode.window.createOutputChannel('Fiora');
   }
 
-  channel.append(`${msg} \n`);
+  channel.append(`[${generateShortTime()}] ${msg} \n`);
 }
